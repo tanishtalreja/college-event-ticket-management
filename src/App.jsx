@@ -1,4 +1,5 @@
 import { useState, useEffect, createContext, useContext } from "react";
+import { EventContext, EventProvider } from "./context/EventContext"; // Import Experiment 4 Context
 
 // ================= CONTEXT (EXPERIMENT 3) =================
 const UserContext = createContext();
@@ -12,19 +13,19 @@ function useDocumentTitle(title) {
 
 // ================= DASHBOARD COMPONENT =================
 function Dashboard() {
-  const { user, cart, removeFromCart } = useContext(UserContext);
+  const { user } = useContext(UserContext);
+  const { cart, removeFromCart } = useContext(EventContext); // Using live Context cart
 
-  // Custom hook usage (updates document title to demonstrate useEffect)
   useDocumentTitle(`Dashboard - ${user.name}`);
 
-  const totalTickets = cart.reduce((sum, item) => sum + item.tickets, 0);
+  const totalTickets = cart.reduce((sum, item) => sum + (item.tickets || 1), 0);
 
   return (
     <div className="mx-auto my-8 max-w-7xl px-5 lg:px-8">
       <div className="flex flex-col justify-between gap-4 rounded-2xl border border-violet-200 bg-violet-50/70 p-6 backdrop-blur md:flex-row md:items-center">
         <div>
           <span className="text-xs font-black uppercase tracking-wider text-violet-600">
-            Experiment 3 Output (State Management)
+            Experiment 4 Output (MongoDB API Integration)
           </span>
           <h2 className="mt-1 text-2xl font-black text-slate-900">
             Welcome, {user.name}!
@@ -37,7 +38,7 @@ function Dashboard() {
 
         <div className="flex flex-wrap items-center gap-3">
           <div className="rounded-xl bg-white px-4 py-2 text-xs font-bold text-violet-700 shadow-sm">
-            ✓ Context API State Active
+            ✓ MongoDB Atlas Connected
           </div>
         </div>
       </div>
@@ -48,10 +49,10 @@ function Dashboard() {
           <h3 className="text-sm font-bold text-slate-700">Your Booked Event Tickets (Global State):</h3>
           <div className="mt-3 flex flex-wrap gap-3">
             {cart.map((item) => (
-              <div key={item.id} className="flex items-center gap-3 rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold">
-                <span>{item.title} ({item.tickets}x)</span>
+              <div key={item._id || item.id} className="flex items-center gap-3 rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold">
+                <span>{item.title} ({item.tickets || 1}x)</span>
                 <button
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(item._id || item.id)}
                   className="rounded-full bg-rose-500 px-2 py-0.5 text-[10px] text-white hover:bg-rose-600"
                 >
                   Remove
@@ -65,102 +66,8 @@ function Dashboard() {
   );
 }
 
-// ================= SAMPLE DATASET =================
-const events = [
-  {
-    id: 1,
-    title: "Tech Fest 2026",
-    category: "Technology",
-    date: "25 AUG",
-    fullDate: "25 August 2026",
-    time: "10:00 AM",
-    venue: "Main Auditorium",
-    price: 100,
-    image:
-      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=900&q=80",
-    description:
-      "A full day of coding, robotics, innovation and everything tech.",
-    color: "from-violet-500 to-indigo-600",
-  },
-  {
-    id: 2,
-    title: "Cultural Night",
-    category: "Cultural",
-    date: "30 AUG",
-    fullDate: "30 August 2026",
-    time: "6:00 PM",
-    venue: "College Ground",
-    price: 150,
-    image:
-      "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Music, dance, drama and unforgettable performances under the lights.",
-    color: "from-pink-500 to-rose-600",
-  },
-  {
-    id: 3,
-    title: "Inter College Cricket",
-    category: "Sports",
-    date: "05 SEP",
-    fullDate: "5 September 2026",
-    time: "9:00 AM",
-    venue: "College Sports Ground",
-    price: 80,
-    image:
-      "https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Bring your squad and cheer for your college at the biggest cricket clash.",
-    color: "from-emerald-500 to-green-600",
-  },
-  {
-    id: 4,
-    title: "Photography Workshop",
-    category: "Workshop",
-    date: "10 SEP",
-    fullDate: "10 September 2026",
-    time: "11:00 AM",
-    venue: "Seminar Hall",
-    price: 200,
-    image:
-      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Learn photography, composition and creative storytelling from experts.",
-    color: "from-orange-400 to-amber-600",
-  },
-  {
-    id: 5,
-    title: "Startup Summit",
-    category: "Business",
-    date: "15 SEP",
-    fullDate: "15 September 2026",
-    time: "10:30 AM",
-    venue: "Conference Hall",
-    price: 250,
-    image:
-      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Meet founders, creators and entrepreneurs building the next big thing.",
-    color: "from-cyan-500 to-blue-600",
-  },
-  {
-    id: 6,
-    title: "Music Festival",
-    category: "Cultural",
-    date: "20 SEP",
-    fullDate: "20 September 2026",
-    time: "5:00 PM",
-    venue: "College Ground",
-    price: 120,
-    image:
-      "https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Live music, student bands and an evening made for good vibes.",
-    color: "from-fuchsia-500 to-purple-600",
-  },
-];
-
-// ================= MAIN APP =================
-function App() {
+// ================= MAIN APP CONTENT =================
+function MainContent() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -169,35 +76,13 @@ function App() {
   const [tickets, setTickets] = useState(1);
   const [bookingMessage, setBookingMessage] = useState("");
 
-  // Context State (Cart Management)
-  const [cart, setCart] = useState([]);
-
-  // Action 1: Add/Update Ticket in Cart
-  const addToCart = (event, qty) => {
-    setCart((prevCart) => {
-      const existing = prevCart.find((item) => item.id === event.id);
-      if (existing) {
-        return prevCart.map((item) =>
-          item.id === event.id ? { ...item, tickets: item.tickets + qty } : item
-        );
-      }
-      return [...prevCart, { ...event, tickets: qty }];
-    });
-  };
-
-  // Action 2: Remove Ticket from Cart
-  const removeFromCart = (eventId) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== eventId));
-  };
+  // Consume live events, loading state, and cart actions from MongoDB EventContext
+  const { events, loading, cart, addToCart } = useContext(EventContext);
 
   const user = {
     name: "Student",
     role: "User",
   };
-
-  useEffect(() => {
-    console.log("Dashboard component loaded into App.");
-  }, []);
 
   const categories = [
     "All",
@@ -216,13 +101,19 @@ function App() {
     );
   };
 
+  // Safe filtering for MongoDB data
   const filteredEvents = events.filter((event) => {
+    const categoryName = event.category || "";
+    const titleName = event.title || "";
+
     const matchesCategory =
-      selectedCategory === "All" || event.category === selectedCategory;
+      selectedCategory === "All" ||
+      categoryName.toLowerCase() === selectedCategory.toLowerCase() ||
+      (selectedCategory === "Technology" && categoryName.toLowerCase() === "tech");
 
     const matchesSearch =
-      event.title.toLowerCase().includes(search.toLowerCase()) ||
-      event.category.toLowerCase().includes(search.toLowerCase());
+      titleName.toLowerCase().includes(search.toLowerCase()) ||
+      categoryName.toLowerCase().includes(search.toLowerCase());
 
     return matchesCategory && matchesSearch;
   });
@@ -262,10 +153,13 @@ function App() {
     setMenuOpen(false);
   };
 
-  const totalCartTickets = cart.reduce((sum, item) => sum + item.tickets, 0);
+  const totalCartTickets = cart.reduce((sum, item) => sum + (item.tickets || 1), 0);
+
+  // Default image fallback if MongoDB record has no image URL
+  const defaultImage = "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=900&q=80";
 
   return (
-    <UserContext.Provider value={{ user, cart, addToCart, removeFromCart }}>
+    <UserContext.Provider value={{ user }}>
       <div className="min-h-screen bg-[#faf9ff] text-slate-900">
         {/* ================= NAVBAR ================= */}
         <nav className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur-xl">
@@ -285,24 +179,9 @@ function App() {
             </a>
 
             <div className="hidden items-center gap-8 md:flex">
-              <a
-                href="#home"
-                className="text-sm font-semibold text-slate-600 transition hover:text-violet-600"
-              >
-                Home
-              </a>
-              <a
-                href="#events"
-                className="text-sm font-semibold text-slate-600 transition hover:text-violet-600"
-              >
-                Discover
-              </a>
-              <a
-                href="#about"
-                className="text-sm font-semibold text-slate-600 transition hover:text-violet-600"
-              >
-                About
-              </a>
+              <a href="#home" className="text-sm font-semibold text-slate-600 transition hover:text-violet-600">Home</a>
+              <a href="#events" className="text-sm font-semibold text-slate-600 transition hover:text-violet-600">Discover</a>
+              <a href="#about" className="text-sm font-semibold text-slate-600 transition hover:text-violet-600">About</a>
 
               {totalCartTickets > 0 && (
                 <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-bold text-violet-700">
@@ -327,7 +206,7 @@ function App() {
           </div>
         </nav>
 
-        {/* ================= EXPERIMENT 3 DASHBOARD BANNER ================= */}
+        {/* ================= EXPERIMENT 4 DASHBOARD BANNER ================= */}
         <Dashboard />
 
         {/* ================= HERO ================= */}
@@ -369,31 +248,28 @@ function App() {
               <div className="relative overflow-hidden rounded-[2rem] bg-slate-950 p-3 shadow-2xl">
                 <div className="relative h-[480px] overflow-hidden rounded-[1.5rem]">
                   <img
-                    src={events[1].image}
-                    alt={events[1].title}
+                    src={events[0]?.image || defaultImage}
+                    alt={events[0]?.title || "Featured Event"}
                     className="h-full w-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
                   <div className="absolute left-5 top-5">
                     <span className="rounded-full bg-white/90 px-4 py-2 text-xs font-black text-slate-900 backdrop-blur">
-                      TRENDING ✦
+                      FEATURED ✦
                     </span>
                   </div>
                   <div className="absolute bottom-6 left-6 right-6 text-white">
                     <p className="text-sm font-semibold text-white/70">
-                      {events[1].date} • {events[1].time}
+                      {events[0]?.date || "Upcoming"} • {events[0]?.location || "Campus"}
                     </p>
                     <h3 className="mt-2 text-4xl font-black">
-                      {events[1].title}
+                      {events[0]?.title || "Live Campus Event"}
                     </h3>
-                    <p className="mt-2 text-sm text-white/70">
-                      Music • Dance • Drama • Good vibes
-                    </p>
                     <button
-                      onClick={() => openBooking(events[1])}
+                      onClick={() => events[0] && openBooking(events[0])}
                       className="mt-5 w-full rounded-xl bg-white py-3 font-bold text-slate-950 transition hover:bg-violet-100"
                     >
-                      Get Tickets — ₹{events[1].price}
+                      Get Tickets — ₹{events[0]?.price || events[0]?.ticketPrice || 0}
                     </button>
                   </div>
                 </div>
@@ -445,38 +321,57 @@ function App() {
             ))}
           </div>
 
-          <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredEvents.map((event) => (
-              <div
-                key={event.id}
-                className="group overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-violet-100"
-              >
-                <div className="relative h-56 overflow-hidden">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
-                  />
-                  <button
-                    onClick={() => toggleFavorite(event.id)}
-                    className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-lg backdrop-blur transition hover:scale-110"
+          {loading ? (
+            <div className="p-12 text-center font-bold text-violet-600">
+              Loading events live from MongoDB Atlas...
+            </div>
+          ) : filteredEvents.length === 0 ? (
+            <div className="p-12 text-center text-slate-500">
+              No events found matching your filter.
+            </div>
+          ) : (
+            <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredEvents.map((event) => {
+                const eventId = event._id || event.id;
+                return (
+                  <div
+                    key={eventId}
+                    className="group overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-violet-100"
                   >
-                    {favorites.includes(event.id) ? "♥" : "♡"}
-                  </button>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-xl font-black tracking-tight">{event.title}</h3>
-                  <p className="mt-3 text-sm text-slate-500">{event.description}</p>
-                  <button
-                    onClick={() => openBooking(event)}
-                    className="mt-6 w-full rounded-xl bg-slate-950 py-3.5 text-sm font-black text-white transition hover:bg-violet-600"
-                  >
-                    Get Tickets →
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+                    <div className="relative h-56 overflow-hidden">
+                      <img
+                        src={event.image || defaultImage}
+                        alt={event.title}
+                        className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                      />
+                      <button
+                        onClick={() => toggleFavorite(eventId)}
+                        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-lg backdrop-blur transition hover:scale-110"
+                      >
+                        {favorites.includes(eventId) ? "♥" : "♡"}
+                      </button>
+                    </div>
+                    <div className="p-5">
+                      <div className="mb-2 flex items-center justify-between text-xs font-bold text-violet-600">
+                        <span>{event.category}</span>
+                        <span>{event.location}</span>
+                      </div>
+                      <h3 className="text-xl font-black tracking-tight">{event.title}</h3>
+                      <p className="mt-3 text-sm text-slate-500">
+                        {event.description || `Date: ${event.date} • Available Tickets: ${event.availableTickets}`}
+                      </p>
+                      <button
+                        onClick={() => openBooking(event)}
+                        className="mt-6 w-full rounded-xl bg-slate-950 py-3.5 text-sm font-black text-white transition hover:bg-violet-600"
+                      >
+                        Get Tickets — ₹{event.price || event.ticketPrice || 0} →
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* ================= BOOKING MODAL ================= */}
@@ -490,7 +385,9 @@ function App() {
               className="w-full max-w-md overflow-hidden rounded-3xl bg-white p-6 shadow-2xl"
             >
               <h2 className="text-2xl font-black">{selectedEvent.title}</h2>
-              <p className="mt-1 text-sm text-slate-500">₹{selectedEvent.price} per ticket</p>
+              <p className="mt-1 text-sm text-slate-500">
+                ₹{selectedEvent.price || selectedEvent.ticketPrice || 0} per ticket
+              </p>
 
               <div className="mt-6 flex items-center justify-between rounded-xl bg-slate-100 p-3">
                 <span className="text-sm font-bold">Select Quantity:</span>
@@ -513,7 +410,7 @@ function App() {
 
               <div className="mt-6 flex items-center justify-between">
                 <span className="text-2xl font-black">
-                  ₹{selectedEvent.price * tickets}
+                  ₹{(selectedEvent.price || selectedEvent.ticketPrice || 0) * tickets}
                 </span>
                 <button
                   onClick={bookTickets}
@@ -536,4 +433,11 @@ function App() {
   );
 }
 
-export default App;
+// Wrapper Component to provide EventContext
+export default function App() {
+  return (
+    <EventProvider>
+      <MainContent />
+    </EventProvider>
+  );
+}
