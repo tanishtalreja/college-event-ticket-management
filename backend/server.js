@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const eventRoutes = require("./routes/eventRoutes");
 
 const app = express();
 
@@ -16,6 +17,15 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((error) => console.log("MongoDB connection error:", error));
 
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    mongo: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    uptime: process.uptime()
+  });
+});
+
 // Added route for Experiment 7 Docker test endpoint
 app.get("/api", (req, res) => {
   res.json({
@@ -23,6 +33,7 @@ app.get("/api", (req, res) => {
   });
 });
 
+app.use("/api/events", eventRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 

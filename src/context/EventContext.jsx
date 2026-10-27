@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import { API_BASE_URL } from "../config/api";
 
 export const EventContext = createContext();
 
@@ -6,15 +7,22 @@ export function EventProvider({ children }) {
   const [events, setEvents] = useState([]);
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Fetch live events from MongoDB Atlas via Express API
   const fetchEvents = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/events");
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`${API_BASE_URL}/api/events`);
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+      }
       const data = await response.json();
-      setEvents(data);
-    } catch (error) {
-      console.error("Error fetching events from MongoDB:", error);
+      setEvents(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error fetching events from MongoDB API:", err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -54,6 +62,7 @@ export function EventProvider({ children }) {
         events,
         cart,
         loading,
+        error,
         fetchEvents,
         addToCart,
         removeFromCart,
