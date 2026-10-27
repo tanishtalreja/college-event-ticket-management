@@ -321,24 +321,7 @@ function MainContent() {
             ))}
           </div>
 
-          {loading ? (
-            <div className="p-12 text-center font-bold text-violet-600">
-              Loading events live from MongoDB Atlas... (Waking up Render backend if idle)
-            </div>
-          ) : error && filteredEvents.length === 0 ? (
-            <div className="mx-auto max-w-md rounded-2xl border border-rose-200 bg-rose-50 p-6 text-center">
-              <p className="font-bold text-rose-600">Connecting to Backend...</p>
-              <p className="mt-1 text-xs text-slate-500">
-                Render free tier may take ~30 seconds to wake up from inactivity.
-              </p>
-              <button
-                onClick={fetchEvents}
-                className="mt-4 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white transition hover:bg-violet-600"
-              >
-                Retry Loading Events ↻
-              </button>
-            </div>
-          ) : filteredEvents.length === 0 ? (
+          {filteredEvents.length === 0 ? (
             <div className="p-12 text-center text-slate-500">
               No events found matching your filter.
             </div>
